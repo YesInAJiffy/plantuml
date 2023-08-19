@@ -1,0 +1,35 @@
+@startuml
+title Sequence Diagram Example
+
+
+actor Actor
+database "Database" as db
+Queue Queue as myQ
+participant "Web Server" as web
+participant "App Server" as app
+participant "BatchProcessor" as batch
+
+
+Actor -> web: GET participants.html
+activate Actor
+Activate web
+web -> app: GET participants.html
+Activate app
+app -> db: SELECT * FROM participants
+Activate db
+note right: Note: check SQL syntax\nwith DBAs
+db --> app: return participant records
+Deactivate db
+
+app -> app: select outliers
+app -> myQ: Send outliers for further processing
+activate myQ
+myQ --> app 
+deactivate myQ
+
+app --> web: return participants.html
+deactivate app
+web --> Actor: return participants.html
+deactivate web
+deactivate Actor
+@enduml
